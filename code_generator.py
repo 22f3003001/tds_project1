@@ -111,8 +111,8 @@ Now generate the complete application code:"""
     
     def _call_llm(self, prompt: str) -> str:
         """Call the LLM API"""
-        if self.provider == 'groq':
-            return self._call_groq(prompt)
+        if self.provider == 'gemini':
+            return self._call_gemini(prompt)
         elif self.provider == 'openai':
             return self._call_openai(prompt)
         elif self.provider == 'anthropic':
@@ -120,26 +120,29 @@ Now generate the complete application code:"""
         else:
             raise ValueError(f"Unsupported provider: {self.provider}")
     
-    def _call_groq(self, prompt: str) -> str:
-        """Call Groq API (free, fast)"""
-        url = "https://api.groq.com/openai/v1/chat/completions"
+    def _call_gemini(self, prompt: str) -> str:
+        """Call Gemini model via AIPipe"""
+        url = "https://aipipe.iitm.ac.in/gemini/v1/models/gemini-1.5-flash:generateContent"
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
         data = {
-            "model": "llama-3.3-70b-versatile",  # Fast and capable
-            "messages": [
-                {"role": "system", "content": "You are an expert web developer who creates clean, functional code."},
-                {"role": "user", "content": prompt}
-            ],
-            "temperature": 0.3,
-            "max_tokens": 8000
+            "contents": [
+                {
+                    "parts": [
+                        {
+                            "text": f"You are an expert web developer who creates clean, functional code.\n\n{prompt}"
+                        }
+                    ]
+                }
+            ]
         }
-        
+
         response = requests.post(url, headers=headers, json=data, timeout=120)
         response.raise_for_status()
-        return response.json()['choices'][0]['message']['content']
+        return response.json()['candidates'][0]['content']['parts'][0]['text']
+
     
     def _call_openai(self, prompt: str) -> str:
         """Call OpenAI API"""
