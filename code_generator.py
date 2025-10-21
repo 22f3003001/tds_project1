@@ -152,7 +152,7 @@ Now generate the complete application code:"""
             "Content-Type": "application/json"
         }
         data = {
-            "model": "gpt-4o-mini",  # Cheap and fast
+            "model": "gpt-4o-mini", 
             "messages": [
                 {"role": "system", "content": "You are an expert web developer who creates clean, functional code."},
                 {"role": "user", "content": prompt}
